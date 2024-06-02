@@ -7,9 +7,9 @@ from ta.trend import ema_indicator
 from tinkoff.invest import Client, RequestError, CandleInterval, HistoricCandle
 from tinkoff.invest.sandbox.client import SandboxClient
 from tinkoff.invest import MoneyValue
-
-
-
+from tinkoff.invest import OrderDirection, OrderType
+from time import sleep
+from uuid import uuid4
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -47,7 +47,14 @@ def account_info(account_id):
         print(str(e))
 
 
-def run():
+def get_accounts_info():
+    try:
+        with SandboxClient("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+            return client.users.get_accounts().accounts
+    except RequestError as e:
+        print(str(e))
+
+def get_accounts_info():
     try:
         with SandboxClient("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
             accounts_info = client.users.get_accounts().accounts
@@ -55,6 +62,31 @@ def run():
                 print(account.id)
     except RequestError as e:
         print(str(e))
+
+
+def buy_stocks(account_id, figi, quantity=1):
+    try:
+        with SandboxClient("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+            order = client.orders.post_order(
+                figi=figi,
+                quantity=quantity,
+                order_id=uuid4(),
+                # order_id=datetime.now().strftime("%Y-%m-%dT %H:%M%S"),
+                direction=OrderDirection.ORDER_DIRECTION_BUY,
+                order_type=OrderType.ORDER_TYPE_MARKET,
+                account_id=account_id
+            )
+            client.orders.post_order(
+
+            )
+            # order = client.sandbox.post_sandbox_order(
+            #
+            # )
+            print(order)
+            # client.sandbox.get_sandbox_portfolio(account_id=account_id)
+    except RequestError as e:
+        print(str(e))
+
 
 # def run():
 #
@@ -69,7 +101,13 @@ def run():
 #     except RequestError as e:
 #         print(str(e))
 
+
+
 clear_sandbox()
 new_account_id = create_new_account()
+# BBG0047730N88
 print(new_account_id)
+buy_stocks(new_account_id, "BBG0047730N88")
+
+sleep(5)
 print(account_info(new_account_id))
