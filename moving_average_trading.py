@@ -127,9 +127,8 @@ def create_df(candles : [HistoricCandle]):
         'high': cast_money(c.high),
         'low': cast_money(c.low),
     } for c in candles])
-
     return df
-
+# Credit: https://azzrael.ru/api-ti?ysclid=lwxvwlpo87613902783
 
 def cast_money(v):
     """

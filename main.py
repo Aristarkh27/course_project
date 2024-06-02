@@ -14,8 +14,9 @@ pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
 
 class moving_average:
-    def __init__(self, window=20):
-        self.window = window
+    def __init__(self, window_short=5, window_long=20):
+        self.window_short = window_short
+        self.window_long = window_long
 
     def fit(self, data):
         self.history_data = data
@@ -31,39 +32,14 @@ class moving_average:
         return 10000000 - current_mean_squared_error
 
     def get_params(self, deep=True):
-        return {"window": self.window}
+        return {"window_short": self.window_short,
+                "window_long": self.window_long}
 
     def set_params(self, **new_params):
         for name, param in new_params.items():
             setattr(self, name, param)
         return self
 
-
-
-class rsi:
-    def __init__(self, window=20):
-        self.window = window
-
-    def fit(self, data):
-        self.history_data = data
-        return self
-
-    def predict(self, data):
-        return self.history_data.rolling(window=self.window).mean()
-
-    def score(self, data):
-        print("&&&&&&&&&&&&&&", self.window, len(self.history_data[self.window:].tolist()))
-        current_mean_squared_error = mean_squared_error(self.history_data[self.window-1:], self.history_data.rolling(window=self.window).mean()[self.window-1:])
-        print("&&&&&&&&&&&&&&", self.window, len(self.history_data[self.window:].tolist()), current_mean_squared_error)
-        return 10000000 - current_mean_squared_error
-
-    def get_params(self, deep=True):
-        return {"window": self.window}
-
-    def set_params(self, **new_params):
-        for name, param in new_params.items():
-            setattr(self, name, param)
-        return self
 
 
 def calculate_moving_average(data):
@@ -93,7 +69,7 @@ def calculate_moving_average(data):
 
 
 
-def calculate_rsi(data, window=14):
+def calculate_rsi(data, window=20):
     delta = data.diff()
     gain = (delta.where(delta > 0, 0)).rolling(window=window).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=window).mean()
@@ -115,7 +91,7 @@ def run(share_name):
             df1 = df.copy()
             df1.to_csv("local_dataset/" + share_name + ".csv", index=False)
             # https://technical-analysis-library-in-python.readthedocs.io/en/latest/ta.html#ta.trend.ema_indicator
-            df['Moving Average'] = calculate_moving_average(df['close'])
+            df['Moving Average'] = calculate_rsi(df['close'])
             #
             #
             print(df[['time', 'close', 'Moving Average']].tail(30))
@@ -138,6 +114,7 @@ def create_df(candles : [HistoricCandle]):
     } for c in candles])
 
     return df
+# Credit: https://azzrael.ru/api-ti?ysclid=lwxvwlpo87613902783
 
 
 def cast_money(v):
