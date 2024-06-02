@@ -21,7 +21,7 @@ fig.show()
 
 
 #  ACF и PACF
-def plot_acf_pacf(data, lags=30):
+def plot_acf_pacf(data, lags=30, filename='acf_pacf_plot.png'):
     fig, axes = plt.subplots(2, 1, figsize=(15, 10))
 
     plot_acf(data, lags=lags, ax=axes[0], title='ACF Plot')
@@ -29,5 +29,7 @@ def plot_acf_pacf(data, lags=30):
 
     plt.tight_layout()
     plt.show()
+    plt.savefig(filename)
+    plt.close()
 
 plot_acf_pacf(df['close'])
