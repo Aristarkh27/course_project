@@ -88,7 +88,7 @@ def calculate_rsi(data):
 def run(share_name):
 
     try:
-        with Client("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+        with Client() as client:
             r = client.market_data.get_candles(
                 figi=share_name,
                 from_=datetime.now() - timedelta(days=350),
