@@ -55,7 +55,7 @@ def insert_prices_into_db_daily(share_name):
             start_days_7 = 0
 
         try:
-            with Client("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+            with Client("") as client:
                 date = midnight_today
                 r = client.market_data.get_candles(
                     figi=share_name,
@@ -106,7 +106,7 @@ def insert_prices_into_db_hourly(share_name):
             start_days_7 = 0
 
         try:
-            with Client("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+            with Client("") as client:
                 date = midnight_today
                 r = client.market_data.get_candles(
                     figi=share_name,
@@ -166,7 +166,7 @@ def fill_table_with_latest_values_daily():
             new_date_time = date_time + timedelta(hours=1)
             print(new_date_time)
             with Client(
-                    "t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+                    "") as client:
                 for c in client.get_all_candles(
                         instrument_id=code,
                         from_=new_date_time,
@@ -203,7 +203,7 @@ def fill_table_with_latest_values_hourly():
             new_date_time = date_time + timedelta(hours=1)
             print(new_date_time)
             with Client(
-                    "t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+                    "") as client:
                 for c in client.get_all_candles(
                         instrument_id=code,
                         from_=new_date_time,
