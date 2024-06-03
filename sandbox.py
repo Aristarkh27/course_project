@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 # Delete all existing accounts
 def clear_sandbox():
     try:
-        with (SandboxClient("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client):
+        with (SandboxClient("") as client):
             accounts_info = client.users.get_accounts().accounts
             for account in accounts_info:
                 client.sandbox.close_sandbox_account(account_id=account.id)
@@ -27,7 +27,7 @@ def clear_sandbox():
 
 def create_new_account():
     try:
-        with (SandboxClient("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client):
+        with (SandboxClient("") as client):
             new_account_id = client.sandbox.open_sandbox_account().account_id
             client.sandbox.sandbox_pay_in(
                 account_id=new_account_id,
@@ -40,7 +40,7 @@ def create_new_account():
 
 def account_info(account_id):
     try:
-        with SandboxClient("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+        with SandboxClient("") as client:
             return client.operations.get_portfolio(account_id=account_id)
 
     except RequestError as e:
@@ -49,14 +49,14 @@ def account_info(account_id):
 
 def get_accounts_info():
     try:
-        with SandboxClient("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+        with SandboxClient("") as client:
             return client.users.get_accounts().accounts
     except RequestError as e:
         print(str(e))
 
 def get_accounts_info():
     try:
-        with SandboxClient("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+        with SandboxClient("") as client:
             accounts_info = client.users.get_accounts().accounts
             for account in accounts_info:
                 print(account.id)
@@ -66,7 +66,7 @@ def get_accounts_info():
 
 def buy_stocks(account_id, figi, quantity=1):
     try:
-        with SandboxClient("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+        with SandboxClient("") as client:
             order = client.orders.post_order(
                 figi=figi,
                 quantity=quantity,
@@ -91,7 +91,7 @@ def buy_stocks(account_id, figi, quantity=1):
 # def run():
 #
 #     try:
-#         with SandboxClient("t.rWXfCVP9o5JNhsgIllWtwxyNPR9dZJZIjSnZ5-xvupVLwsGLLNDa2EMuPvuJM6FzKV3M75rf_DiePZWiCra3fA") as client:
+#         with SandboxClient("") as client:
 #             sb: SandboxService = client.sandbox
 #             account_info = sb.get_account().accounts
 #
