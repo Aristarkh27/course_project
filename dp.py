@@ -148,7 +148,7 @@ codes = ['TCS00A1028C7', 'BBG00HBPXX50', 'BBG00R83FV73', 'BBG00A102RX6', 'BBG00F
 for i in codes:
     print(i)
     insert_prices_into_db_daily(i)
-    #insert_prices_into_db_hourly(i)
+    insert_prices_into_db_hourly(i)
 
 
 def fill_table_with_latest_values_daily():
