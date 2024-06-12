@@ -22,7 +22,7 @@ def cast_money(v):
     """
     return v.units + v.nano / 1e9 # nano - 9 нулей
 
-conn = sqlite3.connect('invest_1.db')
+conn = sqlite3.connect('invest.db')
 cursor = conn.cursor()
 cursor.execute('''CREATE TABLE IF NOT EXISTS  hourly_prices  (
                             company_code TEXT,
