@@ -81,19 +81,9 @@ def run(share_name):
 
     try:
         with Client() as client:
-            r = client.market_data.get_candles(
-                figi=share_name,
-                from_=datetime.utcnow() - timedelta(days=300),
-                to=datetime.utcnow(),
-                interval=CandleInterval.CANDLE_INTERVAL_DAY # см. utils.get_all_candles
-            )
-            df = create_df(r.candles)
-            df1 = df.copy()
-            df1.to_csv("local_dataset/" + share_name + ".csv", index=False)
+            df = read_from_database(share_name)
             # https://technical-analysis-library-in-python.readthedocs.io/en/latest/ta.html#ta.trend.ema_indicator
             df['Moving Average'] = calculate_rsi(df['close'])
-            #
-            #
             print(df[['time', 'close', 'Moving Average']].tail(30))
             ax=df.plot(x='time', y='close')
             df.plot(ax=ax, x='time', y='Moving Average')
@@ -115,6 +105,16 @@ def create_df(candles : [HistoricCandle]):
 
     return df
 # Credit: https://azzrael.ru/api-ti?ysclid=lwxvwlpo87613902783
+
+
+def read_from_database(share_name):
+    conn = sqlite3.connect('invest_1.db')
+    cursor = conn.cursor()
+    s = f"""SELECT time, volume, open, close, high, low from hourly_prices where company_code=?"""
+    cursor.execute(s, (share_name, ))
+    ans = cursor.fetchall()
+    df = pd.DataFrame(ans, columns=['time', 'volume', 'open', 'close', 'high', 'low'])
+    return df
 
 
 def cast_money(v):
