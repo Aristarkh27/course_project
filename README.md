@@ -2,13 +2,12 @@
 
 ** Getting started:**
 
-How to work with the trading bot:
-1. Generate a token:
-1. Open an account in Tinkoff Investments
+*How to generate a token?*
+  1. Open an account in Tinkoff Investments
 
-2. Generate a Tinkoff access token (Токен доступа - T-Invest API (russianinvestments.github.io))
+  2. Generate a Tinkoff access token (Токен доступа - T-Invest API (russianinvestments.github.io))
 
-3. Put this token into my_token.py file
+  3. Put this token into my_token.py file
 
 
 
