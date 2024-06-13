@@ -1,8 +1,6 @@
 from datetime import datetime, timedelta
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 import numpy as np
-from pandas import DataFrame
-from ta.trend import ema_indicator
 from tinkoff.invest import Client, RequestError, CandleInterval
 from loading_data import create_df
 import pandas as pd
@@ -60,6 +58,14 @@ class relative_strength_index:
             setattr(self, name, param)
         return self
 
+    def decision(self, data):
+        delta = data.diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=self.window).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=self.window).mean()
+        rs = gain / loss
+        rsi = 100 - (100 / (1 + rs))
+        return rsi >= 50
+
 
 def calculate_rsi(data):
     param_grid = {
@@ -74,7 +80,7 @@ def calculate_rsi(data):
     print("The earnings of the best model is:", round((grid_model.best_estimator_.score(data) - 1) * 100, 2), end="%\n")
     print("The earning in case of default investing (not conducting any operation) is",
           round((data[len(data) - 1] - data[0]) / data[0] * 100, 2), end="%\n")
-    return best_result
+    return (best_result, grid_model.best_estimator_)
 
 
 def predict_rsi(share_name):
@@ -94,8 +100,8 @@ def predict_rsi(share_name):
             df1.to_csv("local_dataset/" + share_name + ".csv", index=False)
             # https://technical-analysis-library-in-python.readthedocs.io/en/latest/ta.html#ta.trend.ema_indicator
 
-            df['Relative Strength Index'] = calculate_rsi(df['close'])
-            ax=df.plot(x='time', y='close')
+            df['Relative Strength Index'] = calculate_rsi(df['close'])[0]
+            ax = df.plot(x='time', y='close')
             df.plot(ax=ax, x='time', y='Relative Strength Index')
             plt.show()
 
