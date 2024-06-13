@@ -41,7 +41,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS  daily_prices  (
                             high REAL,
                             low REAL)''')
 
-def insert_prices_into_db_daily(share_name):
+def insert_prices_into_db_daily(figi_index):
 
     start_days = 10010
     start_days_7 = start_days-6
@@ -58,7 +58,7 @@ def insert_prices_into_db_daily(share_name):
             with Client("") as client:
                 date = midnight_today
                 r = client.market_data.get_candles(
-                    figi=share_name,
+                    figi=figi_index,
                     from_=date - timedelta(days = start_days),
                     to=date - timedelta(days = start_days_7 + 1),
                     #interval=CandleInterval.CANDLE_INTERVAL_HOUR
@@ -70,7 +70,7 @@ def insert_prices_into_db_daily(share_name):
                     start_days -= 6
                     start_days_7 -= 6
                 else:
-                    daily_candles(share_name, r.candles)
+                    daily_candles(figi_index, r.candles)
                     conn.commit()
                     start_days -= 6
                     start_days_7 -= 6
@@ -92,7 +92,7 @@ def daily_candles(share_name, candles : [HistoricCandle]):
                        (share_name, time, volume, open, close, high, low))
         # print(share_name, time, volume, open, close, high, low)
 # insert_prices_into_db('USD000UTSTOM')
-def insert_prices_into_db_hourly(share_name):
+def insert_prices_into_db_hourly(figi_index):
 
     start_days = 10010
     start_days_7 = start_days-6
@@ -109,7 +109,7 @@ def insert_prices_into_db_hourly(share_name):
             with Client("") as client:
                 date = midnight_today
                 r = client.market_data.get_candles(
-                    figi=share_name,
+                    figi=figi_index,
                     from_=date - timedelta(days = start_days),
                     to=date - timedelta(days = start_days_7),
                     interval=CandleInterval.CANDLE_INTERVAL_HOUR # см. utils.get_all_candles
@@ -120,7 +120,7 @@ def insert_prices_into_db_hourly(share_name):
                     start_days -= 6
                     start_days_7 -= 6
                 else:
-                    create_df(share_name, r.candles)
+                    create_df(figi_index, r.candles)
                     conn.commit()
                     start_days -= 6
                     start_days_7 -= 6
@@ -224,3 +224,6 @@ def fill_table_with_latest_values_hourly():
 
         except:
             print('No such company')
+def add_new_company(figi_index):
+    insert_prices_into_db_daily(figi_index)
+    insert_prices_into_db_hourly(figi_index)
