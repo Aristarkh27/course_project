@@ -11,16 +11,7 @@ from tinkoff.invest import CandleInterval, Client
 from tinkoff.invest.schemas import CandleSource
 from tinkoff.invest.utils import now
 import pytz
-
-
-
-def cast_money(v):
-    """
-    https://tinkoff.github.io/investAPI/faq_custom_types/
-    :param v:
-    :return:
-    """
-    return v.units + v.nano / 1e9 # nano - 9 нулей
+from loading_data import dp.py
 
 conn = sqlite3.connect('invest.db')
 cursor = conn.cursor()
