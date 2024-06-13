@@ -11,7 +11,7 @@ from tinkoff.invest import CandleInterval, Client
 from tinkoff.invest.schemas import CandleSource
 from tinkoff.invest.utils import now
 import pytz
-from loading_data import dp.py
+from loading_data import cast_money
 
 conn = sqlite3.connect('invest.db')
 cursor = conn.cursor()
