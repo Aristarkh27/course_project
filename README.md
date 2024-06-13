@@ -1,5 +1,11 @@
 # course_project
-
+How to work with the trading bot:
+Before you start:
+Download the code from the repository to your computer
+Generate a token:
+Open an account in Tinkoff Investments
+Generate a Tinkoff access token (Токен доступа - T-Invest API (russianinvestments.github.io))
+Put this token into my_token.py file
 
 **База данных**
 Файл с созданием и заплонением базы данных называется db.py. При его запуске он создает или находит уже существующий файл invest.db, в котором хранится сама база данных. Она состоит из двух таблиц - hourly_prices и daily_prices, которые содержат чаовые и дневные котировки соответственно. Массив codes содержит figi-коды компаний, для которых осуществляется сбор данных. При запуске файла для компаний, указанных в списке, собираются все исторические данные. Для того, чтобы поддерживать актуальность базы данных, созданы функции fill_table_with_latest_values_hourly() и fill_table_with_latest_values_daily(), которые для каждой компании в таблице загружают все новые данные. Эти функции рекомендуется вызывать перед использованием самих алгоритмов, чтобы использовать максимально свежие данные.
