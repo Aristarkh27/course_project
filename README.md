@@ -18,6 +18,7 @@ Sklearn-compatible model needs to have the following methods:
   4. __score__ - this method evaluates the model performance. In our case this is a combination of maximal loss and 
   5. __get_params__ - this method returns the parameters of the model
   6. __set_params__ - this method sets the parameters to the same as specified in the input
+
 You can see examples of such models in relative_strength_index.py (relative_strength_index model) and moving_average.py (moving_average class)
 
 **База данных**
