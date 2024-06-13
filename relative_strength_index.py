@@ -1,18 +1,13 @@
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
-from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import GridSearchCV, TimeSeriesSplit
 import numpy as np
 from pandas import DataFrame
 from ta.trend import ema_indicator
-from tinkoff.invest import Client, RequestError, CandleInterval, HistoricCandle
-
+from tinkoff.invest import Client, RequestError, CandleInterval
+from loading_data import create_df
 import pandas as pd
 import matplotlib.pyplot as plt
-
-pd.set_option('display.max_rows', 2500)
-pd.set_option('display.max_columns', 2500)
-pd.set_option('display.width', 15000)
+from my_token import my_token
 
 class relative_strength_index:
     def __init__(self, window=5):
@@ -55,7 +50,6 @@ class relative_strength_index:
             selling_price = history[period_end - 1]
             current_amount /= buying_price
             current_amount *= selling_price
-        print(current_amount)
         return current_amount
 
     def get_params(self, deep=True):
@@ -71,24 +65,24 @@ def calculate_rsi(data):
     param_grid = {
         'window': np.arange(3, 50),
     }
-    # print(*data)
     grid_model = GridSearchCV(relative_strength_index(data), param_grid=param_grid, cv=TimeSeriesSplit(n_splits=2))
     grid_model.fit(data)
-    print(grid_model.best_estimator_.get_params())
     best_result = grid_model.best_estimator_.predict(data)
-    best_window_size = 20
-    new_data = data.rolling(window=best_window_size).mean()
-    new_data = new_data.tolist()
-    new_data_1 = data.tolist()
-    # return data.rolling(window=best_window_size).mean()
+    print("The best parameters are:")
+    for pair in grid_model.best_params_:
+        print(pair, "is", grid_model.best_params_[pair])
+    print("The earnings of the best model is:", round((grid_model.best_estimator_.score(data) - 1) * 100, 2), end="%\n")
+    print("The earning in case of default investing (not conducting any operation) is",
+          round((data[len(data) - 1] - data[0]) / data[0] * 100, 2), end="%\n")
     return best_result
 
 
-
-def run(share_name):
-
+def predict_rsi(share_name):
     try:
-        with Client() as client:
+        pd.set_option('display.max_rows', 2500)
+        pd.set_option('display.max_columns', 2500)
+        pd.set_option('display.width', 15000)
+        with Client(my_token) as client:
             r = client.market_data.get_candles(
                 figi=share_name,
                 from_=datetime.now() - timedelta(days=350),
@@ -109,27 +103,4 @@ def run(share_name):
         print(str(e))
 
 
-def create_df(candles : [HistoricCandle]):
-    df = DataFrame([{
-        'time': c.time,
-        'volume': c.volume,
-        'open': cast_money(c.open),
-        'close': cast_money(c.close),
-        'high': cast_money(c.high),
-        'low': cast_money(c.low),
-    } for c in candles])
-
-    return df
-# Credit: https://azzrael.ru/api-ti?ysclid=lwxvwlpo87613902783
-
-
-def cast_money(v):
-    """
-    https://tinkoff.github.io/investAPI/faq_custom_types/
-    :param v:
-    :return:
-    """
-    return v.units + v.nano / 1e9 # nano - 9 нулей
-
-run('USD000UTSTOM')
-# run('TCS00A102EQ7')
+predict_rsi('USD000UTSTOM')
