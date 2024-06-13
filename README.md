@@ -12,9 +12,9 @@
 **Hyperparameters search**
 In our project we used the GridSearchCV method from the sklearn.model_selection library. In order to successfully implement this method to your algorithm you need to create a sklearn-compatible model or use one of sklearn algorithms for your analysis. In our project we created several sklearn-compatible models, as an example (for moving average (MA) and relative strength index (RSI)).
 Sklearn-compatible model needs to have the following functions:
-  1. __init__
-  2. fit - fit the 
-  3. predict
+  1. \_\_init\_\_ model initialisation, for example, specifying window size for the RSI model
+  2. fit - fit the model with the data. In case of the RSI and MA this is a technical step, required only for proper work of the other functions
+  3. predict - 
   4. score
 You can see examples of such models in relative_strength_index.py (relative_strength_index model) and moving_average.py (moving_average class)
 
