@@ -8,54 +8,61 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.dates import DateFormatter
 import numpy as np
 from datetime import datetime, timedelta
+from moving_average import calculate_moving_average
+from relative_strength_index import calculate_rsi
+from loading_data import read_from_database, read_from_database_all
+import datetime
+import pytz
 
-def moving_average(data, window):
-    return data.rolling(window=window).mean()
 
-def calculate_rsi(data, window=14):
-    delta = data.diff(1)
-    gain = delta.where(delta > 0, 0)
-    loss = -delta.where(delta < 0, 0)
-    avg_gain = gain.rolling(window=window, min_periods=1).mean()
-    avg_loss = loss.rolling(window=window, min_periods=1).mean()
-    rs = avg_gain / avg_loss
-    return 100 - (100 / (1 + rs))
+# def load_stock_data(stock_code):
+#     df = read_from_database_all(stock_code)
+#     df['time'] = pd.to_datetime(df['time'])
+#     df.set_index('time', inplace=True)
+#     return df
 
-def load_stock_data(stock_code):
-    df = pd.read_csv(f'{stock_code}.csv')
-    df['time'] = pd.to_datetime(df['time'])
-    df.set_index('time', inplace=True)
-    return df
 
 def run_trading_robot():
     global df, result, start_date, end_date
     stock_code = stock_code_var.get()
     start_date = start_date_entry.get()
+    start_date = datetime.datetime.strptime(start_date, "%Y-%m-%d").date()
+    start_date = datetime.datetime.combine(start_date, datetime.time())
+    start_date = start_date.replace(tzinfo=pytz.UTC)
     end_date = end_date_entry.get()
+    end_date = datetime.datetime.strptime(end_date, "%Y-%m-%d").date()
+    end_date = datetime.datetime.combine(end_date, datetime.time())
+    end_date = end_date.replace(tzinfo=pytz.UTC)
+    print()
     algorithm = algorithm_var.get()
 
-    df = load_stock_data(stock_code)
-    df = df[start_date:end_date]
-
+    df = read_from_database(stock_code, start_date, end_date)
+    print(df)
     if algorithm == "Moving Average":
-        result = moving_average(df['close'], window=20)
-        plot_data(df, result, 'Moving Average')
+        result = calculate_moving_average(df['close'])[0]
+        plot_data(df, result, ['Moving Average short', 'Moving Average long'])
     elif algorithm == "RSI":
-        result = calculate_rsi(df['close'])
-        plot_data(df, result, 'RSI')
+        result = calculate_rsi(df['close'])[0]
+        plot_data(df, result, ['RSI'])
 
-def plot_data(df, result, title):
+
+def plot_data(df, result, titles):
     global canvas, fig, ax
     fig, ax = plt.subplots(figsize=(10, 5))
     df['close'].plot(ax=ax, label='Close Price')
-    result.plot(ax=ax, label=title)
-    ax.set_title(f'{title} for {stock_code_var.get()}')
+    for title in titles:
+        result.plot(ax=ax, label=title)
+    graph_title = "Moving Average"
+    if titles[0] == "RSI":
+        graph_title = "RSI"
+    ax.set_title(f'{graph_title} for {stock_code_var.get()}')
     ax.legend()
     ax.xaxis.set_major_formatter(DateFormatter("%Y-%m-%d"))
     plt.xticks(rotation=45)
     canvas = FigureCanvasTkAgg(fig, master=plot_frame)
     canvas.draw()
     canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+
 
 # Функция обновления графика
 def update_plot():
@@ -67,6 +74,7 @@ def update_plot():
         current_result = result.iloc[:update_plot.counter]
 
         ax.clear()
+        # current_data.plot(x='time', y='close')
         current_data['close'].plot(ax=ax, label='Close Price')
         current_result.plot(ax=ax, label=algorithm_var.get())
         ax.set_title(f'{algorithm_var.get()} for {stock_code_var.get()}')
@@ -76,16 +84,17 @@ def update_plot():
         canvas.draw()
         update_plot.counter += 1
 
-        if np.random.rand() > 0.5:
-            action = "Buy"
-            profit = round(np.random.rand() * 100, 2)
-        else:
-            action = "Sell"
-            profit = round(np.random.rand() * -100, 2)
-
-        result_label.config(text=f"Action: {action}, Profit: {profit}")
+        # if np.random.rand() > 0.5:
+        #     action = "Buy"
+        #     profit = round(np.random.rand() * 100, 2)
+        # else:
+        #     action = "Sell"
+        #     profit = round(np.random.rand() * -100, 2)
+        #
+        # result_label.config(text=f"Action: {action}, Profit: {profit}")
 
         window.after(1000, update_plot)  # обновление графика
+
 
 window = tk.Tk()
 window.title("Trading Robot Interface")
@@ -93,7 +102,7 @@ window.geometry("900x700")
 window.configure(bg="#e0f7fa")
 
 logo_image = Image.open("logo.png")
-logo_image = logo_image.resize((100, 100), Image.ANTIALIAS)  # Изменение размера логотипа
+logo_image = logo_image.resize((100, 100), Image.LANCZOS)  # Изменение размера логотипа
 logo = ImageTk.PhotoImage(logo_image)
 logo_label = tk.Label(window, image=logo, bg="#e0f7fa")
 logo_label.pack(pady=10)
@@ -129,3 +138,9 @@ result_label = tk.Label(window, text="", bg="#e0f7fa", font=("Arial", 12))
 result_label.pack(pady=10)
 
 window.mainloop()
+
+
+# TCS00A1028C7
+# 2021-01-01
+# 2023-01-01
+#
