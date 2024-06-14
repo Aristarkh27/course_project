@@ -8,7 +8,7 @@ from loading_data import read_from_database
 from my_token import my_token
 from datetime import datetime, timedelta
 from relative_strength_index import calculate_rsi
-
+from pytz import timezone
 
 # Delete all existing accounts
 def clear_sandbox():
@@ -107,22 +107,30 @@ def sell_stocks(account_id, instrument_id, quantity=1):
 
 
 def start_trading(account_id, share_name, period_start, period_end, algorithm):
-    # data = read_from_database(share_name, period_start, period_end)
-    # model = algorithm(data)[1]
+    data = read_from_database(share_name, period_start, period_end)
+    print(data)
+    print(1000)
+    model = algorithm(data['close'], 10)[1]
+    buying_price = None
+    selling_price = None
+    current_amount = 1
     while True:
-        print(10)
+        data = read_from_database(share_name, period_start, period_end)
         # 0 means sell and 1 means buy
-        # if model.decision(data):
-        #     buy_stocks(account_id, share_name)
-        # else:
-        #     sell_stocks(account_id, share_name)
-        # sleep(10)
+        if model.decision(data['close']) and buying_price is None:
+            buy_stocks(account_id, share_name)
+            buying_price = data['close'][-1]
+        elif selling_price is None:
+            sell_stocks(account_id, share_name)
+            selling_price = data['close'][-1]
+        sleep(60)
 
 
 clear_sandbox()
 new_account_id = create_new_account(100000)
 # BBG0047730N88
-start_trading(new_account_id, "TCS00A1028C7", datetime.now(), datetime.now() - timedelta(days=350), calculate_rsi)
+# BBG0000BBV4MA
+start_trading(new_account_id, "BBG00FZMB3Y3", datetime.now(timezone("UTC")) - timedelta(days=1300), datetime.now(timezone("UTC")), calculate_rsi)
 # print(new_account_id)
 # # buy_stocks(new_account_id, "BBG0047730N88")
 # buy_stocks(new_account_id, "TCS00A102EQ7")
