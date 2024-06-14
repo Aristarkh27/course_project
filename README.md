@@ -2,24 +2,25 @@
 
 ** Getting started:**
 
-**How to generate a token?**
-  1. Open an account in Tinkoff Investments
+**Как сгенерировать токен?**
+ 1. Открыть счет в Тинькофф Инвестиции.
 
-  2. Generate a Tinkoff access token (Токен доступа - T-Invest API (russianinvestments.github.io))
+ 2. Сгенерировать токен доступа Тинькофф (Токен доступа - Т-Инвест API (russianinvestments.github.io))
 
-  3. Put this token into my_token.py file
+ 3. Поместите этот токен в файл my_token.py.
 
-**Hyperparameters search**
-In our project we used the GridSearchCV method from the sklearn.model_selection library. In order to successfully implement this method to your algorithm you need to create a sklearn-compatible model or use one of sklearn algorithms for your analysis. In our project we created several sklearn-compatible models, as an example (for moving average (MA) and relative strength index (RSI)).
-Sklearn-compatible model needs to have the following methods:
-  1. __\_\_init\_\___ model initialisation, for example, specifying window size for the RSI model
-  2. __fit__ - fit the model with the data. In case of the RSI and MA this is a technical step, required only for proper work of the other functions
-  3. __predict__ - this method outputs the model prediction for the existing data
-  4. __score__ - this method evaluates the model performance. In our case this is a combination of maximal loss and 
-  5. __get_params__ - this method returns the parameters of the model
-  6. __set_params__ - this method sets the parameters to the same as specified in the input
+**Подбор гиперпараметров**
+В нашем проекте мы использовали метод GridSearchCV из библиотеки sklearn.model_selection. Чтобы успешно реализовать этот метод в вашем алгоритме, вам необходимо создать модель, совместимую со sklearn, или использовать один из алгоритмов sklearn для анализа. В нашем проекте мы создали несколько моделей, совместимых со sklearn, например (для скользящей средней (MA) и индекса относительной силы (RSI)).
+Модель, совместимая со Sklearn, должна иметь следующие методы:
 
-You can see examples of such models in relative_strength_index.py (relative_strength_index model) and moving_average.py (moving_average class)
+  1. __\_\_init\_\___ mинициализация модели, например, задание размера окна для модели RSI
+  2. __fit__ - использовать данные для тренировки модели. В случае с RSI и MA это технический шаг, необходимый только для корректной работы остальных функций.
+  3. __predict__ - этот метод выводит прогноз модели для введённых данных
+  4. __score__ - этот метод оценивает производительность модели. В нашем случае этими параметрами выступают сочетание максимальных потерь и итоговой прибыли
+  5. __get_params__ - этот метод возвращает параметры модели
+  6. __set_params__ - этот метод устанавливает параметры такие же, как указано во входных данных
+
+Вы можете увидеть примеры таких моделей в relative_strength_index.py (класс relative_strength_index) и moving_average.py (класс moving_average).
 
 **База данных**
 Файл с созданием и заплонением базы данных называется db.py. При его запуске он создает или находит уже существующий файл invest.db, в котором хранится сама база данных. Она состоит из двух таблиц - hourly_prices и daily_prices, которые содержат чаовые и дневные котировки соответственно. Массив codes содержит figi-коды компаний, для которых осуществляется сбор данных. При запуске файла для компаний, указанных в списке, собираются все исторические данные. Для того, чтобы поддерживать актуальность базы данных, созданы функции fill_table_with_latest_values_hourly() и fill_table_with_latest_values_daily(), которые для каждой компании в таблице загружают все новые данные. Эти функции рекомендуется вызывать перед использованием самих алгоритмов, чтобы использовать максимально свежие данные.
